@@ -1,452 +1,228 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RPG 로그 북 - LEON 마스터 에디션 V10.5</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/DungGeunMo.woff');
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>서재</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#ecebe6;color:#151515;font-family:Pretendard,'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 48px}
+h1{font-family:Hahmlet,'Noto Serif KR','Nanum Myeongjo',serif;font-size:40px;font-weight:600;letter-spacing:.04em;margin:0 0 22px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+input,textarea,button{font:inherit;color:inherit}
+input,textarea{background:transparent;border:0;border-bottom:1.5px solid #151515;border-radius:0;padding:9px 2px;outline:none}
+input::placeholder,textarea::placeholder{color:#9a978f}
+input:focus,textarea:focus{border-color:#ff4d2e}
+input[type=color]{width:34px;height:34px;padding:0;border:0;border-radius:50%;cursor:pointer;overflow:hidden}
+input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+input[type=color]::-webkit-color-swatch{border:0;border-radius:50%}
+input[type=file]{border:0;padding:0}
+button{background:#151515;color:#fff;border:1.5px solid #151515;border-radius:999px;padding:9px 18px;cursor:pointer;font-weight:600;font-size:14px;transition:.15s}
+button:hover{background:#ff4d2e;border-color:#ff4d2e}
+button.ghost{background:transparent;color:#151515}
+button.ghost:hover{background:#151515;color:#fff;border-color:#151515}
+.tabs{display:flex;gap:18px;flex-wrap:wrap;margin:18px 0 14px}
+.tab{background:none;color:#8d8a82;border:0;border-bottom:2px solid transparent;border-radius:0;padding:4px 0;font-size:15px;font-weight:700}
+.tab:hover{background:none;color:#151515;border-color:transparent}
+.tab.on{color:#151515;border-bottom-color:#151515}
+.tab small{margin-left:5px;font-size:11px;color:#ff4d2e}
 
-        :root {
-            --main-brown: #3e2723;
-            --hp-color: #ff5252;
-            --mp-color: #2196f3;
-            --exp-color: #ffd740;
-            --gold-color: #ff8f00;
-            --mint-color: #26c6da;
-            --danger-color: #d32f2f;
-        }
+/* 책장 */
+#shelf{background:linear-gradient(#f8f7f3,#f0efe9);border-radius:22px;padding:6px 0 4px;box-shadow:0 1px 0 #fff inset,0 24px 50px -24px rgba(30,25,15,.35)}
+.sh-head{display:flex;justify-content:space-between;align-items:baseline;padding:22px 30px 14px}
+.sh-head b{font-family:'Playfair Display',Georgia,'Noto Serif KR',serif;font-size:30px;font-weight:600;letter-spacing:.04em;line-height:1}
+.sh-head span{font-size:12px;letter-spacing:.14em;color:#8d8a82;text-transform:uppercase}
+.case{margin:0 24px 28px;padding:14px;border-radius:6px;
+ background:repeating-linear-gradient(90deg,rgba(120,80,30,.09) 0 1px,transparent 1px 8px),linear-gradient(90deg,#d6b27c,#e4c898 50%,#d3ae78);
+ box-shadow:0 22px 30px -16px rgba(60,35,10,.55),inset 0 2px 0 rgba(255,255,255,.4),inset 0 -2px 0 rgba(90,55,20,.25)}
+.row{position:relative;display:flex;align-items:flex-end;gap:2px;height:312px;padding:0 22px;margin-bottom:18px;
+ background:repeating-linear-gradient(90deg,rgba(120,90,50,.05) 0 1px,transparent 1px 12px),linear-gradient(#e3d6c0,#efe5d3);
+ box-shadow:inset 0 20px 18px -14px rgba(60,40,15,.4),inset 16px 0 14px -12px rgba(60,40,15,.28),inset -16px 0 14px -12px rgba(60,40,15,.28)}
+.row::after{content:"";position:absolute;left:-14px;right:-14px;bottom:-18px;height:18px;
+ background:linear-gradient(#f4deb7 0 5px,transparent 5px),repeating-linear-gradient(90deg,rgba(110,70,25,.1) 0 1px,transparent 1px 9px),linear-gradient(#dcbb88,#c59d68);
+ box-shadow:0 10px 12px -6px rgba(60,35,10,.5)}
+.row:last-child{margin-bottom:0}
+.row:last-child::after{bottom:-14px;height:14px;box-shadow:none}
 
-        body { transition: background-color 1s ease; font-family: 'DungGeunMo', sans-serif; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        
-        .theme-rookie { background-color: #f4f7f6; }
-        .theme-apprentice { background-color: #e8f5e9; }
-        .theme-veteran { background-color: #fff3e0; }
-        .theme-legend { background-color: #f3e5f5; }
+/* 책 */
+.book{position:relative;flex:none;cursor:pointer;transition:transform .2s,filter .2s;margin-top:8px}
+.book:hover{transform:translateY(-10px)}
+.face{position:absolute;inset:0;border-radius:1px 2px 0 0;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 0 8px;
+ box-shadow:2px 0 6px -2px rgba(0,0,0,.3)}
+.book::after{content:"";position:absolute;inset:0;border-radius:1px 2px 0 0;pointer-events:none;
+ background:linear-gradient(90deg,rgba(0,0,0,.2),rgba(255,255,255,.1) 9%,rgba(255,255,255,0) 38%,rgba(0,0,0,.08) 88%,rgba(0,0,0,.22))}
+.top{position:absolute;left:1px;right:0;top:-6px;height:7px;border-radius:2px 2px 0 0;background:var(--c);box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.top::after{content:"";position:absolute;left:3px;right:3px;top:1px;bottom:2px;border-radius:1px 1px 0 0;
+ background:repeating-linear-gradient(0deg,#f6f1e6 0 1px,#e6dcc7 1px 2px)}
+.v1 .face::before{content:"";position:absolute;left:0;right:0;top:10px;height:2px;background:rgba(255,255,255,.55)}
+.v2 .face::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:rgba(255,255,255,.14);border-top:1px solid rgba(255,255,255,.4)}
+.img .face::before,.img .face::after{display:none}
+.t,.a{position:relative;z-index:1;writing-mode:vertical-rl}
+.t{font-weight:800;line-height:1.15;max-height:78%;overflow:hidden;letter-spacing:.2px;margin-top:6px}
+.a{font-size:9px;opacity:.8;max-height:20%;overflow:hidden;white-space:nowrap;letter-spacing:.06em}
 
-        .container { width: 100%; max-width: 450px; position: relative; }
+#tip{position:fixed;z-index:20;pointer-events:none;background:#151515;color:#fff;border-radius:10px;padding:9px 12px;font-size:13px;line-height:1.5;display:none;max-width:220px;box-shadow:0 10px 24px rgba(0,0,0,.3)}
+#tip .s{color:#ff7a5c;letter-spacing:2px}
+.modal{position:fixed;inset:0;background:rgba(20,18,14,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}
+.modal.on{display:flex}
+.card{background:#f8f7f3;border-radius:22px;padding:24px;width:min(460px,100%);display:grid;gap:12px;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.card h2{margin:0;font-size:22px;letter-spacing:-.03em}.card .au{color:#8d8a82;font-size:13px;margin-top:-8px}
+.stars span{font-size:30px;cursor:pointer;color:#d5d2c9}.stars span.on{color:#ff4d2e}
+textarea{min-height:140px;resize:vertical;border:1.5px solid #d5d2c9;border-radius:12px;padding:12px}
+textarea:focus{border-color:#151515}
+.btns{display:flex;gap:8px;justify-content:flex-end}
+.btns .del{margin-right:auto;background:transparent;color:#d33;border-color:#e8c4bd}
+.btns .del:hover{background:#d33;color:#fff;border-color:#d33}
+.up{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:#555}
+#mPrev{height:64px;border-radius:4px;display:none}
+</style></head><body>
+<div class="wrap">
+<h1>서재</h1>
 
-        .card {
-            background: white; border: 3px solid var(--main-brown);
-            padding: 15px; border-radius: 12px; margin-bottom: 12px;
-            box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
-        }
-
-        .profile-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; border-bottom: 2px dashed #ddd; padding-bottom: 8px; }
-        .lv-info { font-size: 1.3rem; font-weight: bold; }
-        .job-title { font-size: 0.85rem; color: #795548; display: block; }
-        
-        .status-icon { font-size: 1rem; margin-left: 3px; vertical-align: middle; }
-        .alert-icon { font-size: 1.1rem; color: var(--danger-color); font-weight: bold; animation: blink 1s infinite; margin-left: 5px; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .status-text { font-size: 0.75rem; font-weight: bold; margin-left: 5px; }
-        .hp-text { color: var(--hp-color); }
-        .mp-text { color: var(--mp-color); }
-
-        .bar-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 8px; align-items: center; }
-        .bar-container { width: 100%; height: 20px; background: #eee; border: 2px solid var(--main-brown); border-radius: 10px; margin: 4px 0; overflow: hidden; }
-        .bar-fill { height: 100%; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .hp-fill { background-color: var(--hp-color); }
-        .mp-fill { background-color: var(--mp-color); }
-        .exp-fill { background-color: var(--exp-color); }
-
-        .control-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; }
-        .control-box { background: #fdfdfd; border: 2px solid var(--main-brown); padding: 8px; border-radius: 8px; font-size: 0.75rem; }
-        .control-box strong { display: block; margin-bottom: 5px; color: var(--main-brown); }
-        .control-box input { font-family: 'DungGeunMo'; width: 100%; box-sizing: border-box; margin-bottom: 5px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.7rem; }
-        
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-        .btn-full { grid-column: span 2; background: #f0f0f0 !important; font-weight: bold; }
-        
-        .chart-container { width: 100%; height: 220px; margin: 5px 0; }
-
-        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
-        .stat-item { text-align: left; font-size: 0.65rem; font-weight: bold; background: white; padding: 8px; border: 1px solid #eee; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .stat-item input { width: 45px; text-align: center; border: 2px solid var(--main-brown); border-radius: 4px; font-family: 'DungGeunMo'; font-size: 0.8rem; padding: 2px; }
-
-        .grid-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .section-title { font-size: 0.9rem; margin: 10px 0 5px 0; font-weight: bold; display: flex; align-items: center; justify-content: space-between; }
-        
-        .toggle-btn-group { display: flex; gap: 3px; }
-        .t-btn { font-family: 'DungGeunMo'; font-size: 0.6rem; padding: 2px 5px; cursor: pointer; border: 1px solid #ccc; border-radius: 3px; background: #f0f0f0; }
-        .t-btn.active-b { background: #b2ebf2; border-color: var(--mint-color); font-weight: bold; }
-        .t-btn.active-d { background: #ffcdd2; border-color: #e57373; font-weight: bold; }
-
-        .quest-list { background: #fff; border: 2px solid var(--main-brown); padding: 10px; border-radius: 10px; min-height: 140px; }
-        .quest-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; padding: 3px 0; }
-        
-        .buff-box { background: #fff; border: 3px solid var(--mint-color); padding: 10px; border-radius: 10px; font-size: 0.75rem; color: #333; display: flex; flex-direction: column; gap: 4px; }
-        .buff-box input { border: none; border-bottom: 1px solid #ddd; font-family: 'DungGeunMo'; font-size: 0.7rem; width: 100%; padding: 2px 0; background: transparent; }
-        .buff-box input:focus { outline: none; border-bottom: 1px solid var(--mint-color); }
-        .buff-label { color: #00838f; font-weight: bold; }
-
-        .special-box { background: #f3e5f5; border: 2px solid #a333c8; padding: 10px; border-radius: 10px; display: flex; gap: 5px; }
-        .special-box input { flex: 1; font-family: 'DungGeunMo'; padding: 5px; border: 1px solid #a333c8; border-radius: 4px; }
-        .special-btn { background: #a333c8; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'DungGeunMo'; font-size: 0.75rem; }
-        
-        button { font-family: 'DungGeunMo'; cursor: pointer; border: 2px solid var(--main-brown); background: white; padding: 5px; border-radius: 4px; font-size: 0.7rem; }
-
-        .log-area { background: #1a1a1a; padding: 10px; border-radius: 8px; height: 160px; overflow-y: auto; font-size: 0.75rem; line-height: 1.5; border: 2px solid var(--main-brown); margin-top: 5px; }
-        .log-pos { color: #4caf50; }
-        .log-neg { color: #ff5252; font-weight: bold; }
-        .log-special { color: #d1a3ff; font-weight: bold; }
-        .log-user { color: #64b5f6; } 
-
-        .user-log-box { display: flex; gap: 5px; margin-top: 8px; width: 100%; }
-        .user-log-box input { flex: 1; font-family: 'DungGeunMo'; padding: 8px; border: 2px solid #2196f3; border-radius: 6px; font-size: 0.8rem; }
-        .user-log-btn { background: #2196f3; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-family: 'DungGeunMo'; }
-
-        .footer-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 15px 0; width: 100%; }
-        .reset-btn { background: none; border: 1px solid #ccc; color: #888; padding: 5px; font-size: 0.65rem; border-radius: 4px; cursor: pointer; }
-
-        /* 레벨업 효과 애니메이션 */
-        @keyframes levelUpPop {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .levelup-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999;
-        }
-        .levelup-card {
-            background: white; border: 5px solid var(--exp-color);
-            padding: 30px; border-radius: 20px; text-align: center;
-            animation: levelUpPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-    </style>
-</head>
-<body class="theme-rookie">
-
-<div class="container">
-    <div class="card">
-        <div class="profile-header">
-            <div class="lv-info">
-                <span class="job-title" id="job-title">모험가</span>
-                Lv.<span id="lv-val">1</span> LEON 
-                <span id="name-buff" class="status-icon" style="display:none">✨</span>
-                <span id="name-debuff" class="status-icon" style="display:none">💤</span>
-                <span id="name-alert" class="alert-icon" style="display:none">❗</span>
-            </div>
-            <span id="gold-val" style="color:var(--gold-color); font-size: 1.1rem;">0 G</span>
-        </div>
-        
-        <div class="bar-label"><span>❤️ HP <span id="hp-status" class="status-text hp-text">[계산중]</span></span><span id="hp-num" style="font-size: 0.7rem;">70/100</span></div>
-        <div class="bar-container"><div id="hp-bar" class="bar-fill hp-fill"></div></div>
-        
-        <div class="bar-label"><span>💧 MP <span id="mp-status" class="status-text mp-text">[계산중]</span></span><span id="mp-num" style="font-size: 0.7rem;">70/100</span></div>
-        <div class="bar-container"><div id="mp-bar" class="bar-fill mp-fill"></div></div>
-        
-        <div class="bar-label"><span>⭐ EXP</span></div>
-        <div class="bar-container"><div id="exp-bar" class="bar-fill exp-fill"></div></div>
-
-        <div class="control-group">
-            <div class="control-box">
-                <strong>[상태 조절]</strong>
-                <input type="text" id="status-reason" placeholder="변화 사유">
-                <div class="btn-grid">
-                    <button onclick="updateStatus('hp', 10)">H+10</button><button onclick="updateStatus('hp', -10)">H-10</button>
-                    <button onclick="updateStatus('mp', 10)">M+10</button><button onclick="updateStatus('mp', -10)">M-10</button>
-                    <button class="btn-full" onclick="promptStatus('hp')">H+@</button>
-                    <button class="btn-full" onclick="promptStatus('mp')">M+@</button>
-                </div>
-            </div>
-            <div class="control-box">
-                <strong>[성장 관리]</strong>
-                <input type="text" id="exp-reason" placeholder="이벤트 사유">
-                <div class="btn-grid">
-                    <button onclick="updateExp(50)">E+50</button><button onclick="updateExp(20)">E+20</button>
-                    <button onclick="updateExp(10)">E+10</button><button onclick="updateGold()">Gold</button>
-                    <button class="btn-full" onclick="promptExp()">E+@</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="chart-container"><canvas id="statChart"></canvas></div>
-        <div class="stat-grid">
-            <div class="stat-item">💪 STR<input type="number" id="in-str" onchange="changeStat('str', this.value)"></div>
-            <div class="stat-item">🧠 INT<input type="number" id="in-int" onchange="changeStat('int', this.value)"></div>
-            <div class="stat-item">🏃 DEX<input type="number" id="in-dex" onchange="changeStat('dex', this.value)"></div>
-            <div class="stat-item">🎨 SENSE<input type="number" id="in-sense" onchange="changeStat('sense', this.value)"></div>
-            <div class="stat-item">🛡️ WILL<input type="number" id="in-will" onchange="changeStat('will', this.value)"></div>
-            <div class="stat-item">🍀 LUK<input type="number" id="in-luk" onchange="changeStat('luk', this.value)"></div>
-        </div>
-    </div>
-
-    <div class="grid-layout">
-        <div>
-            <div class="section-title">🛡️ 퀘스트(+30)</div>
-            <div class="quest-list" id="quest-container"></div>
-        </div>
-        <div>
-            <div class="section-title">✨ 버프
-                <div class="toggle-btn-group">
-                    <button id="btn-buff" class="t-btn" onclick="toggleStatus('buff')">버프</button>
-                    <button id="btn-debuff" class="t-btn" onclick="toggleStatus('debuff')">디버프</button>
-                </div>
-            </div>
-            <div class="buff-box">
-                <div><span class="buff-label">> 단계 :</span> <input type="text" id="buff-lv" onchange="saveBuff()"></div>
-                <div><span class="buff-label">> 아이템 :</span> <input type="text" id="buff-item" onchange="saveBuff()"></div>
-                <input type="text" id="buff-c1" placeholder="1줄" onchange="saveBuff()"><input type="text" id="buff-c2" placeholder="2줄" onchange="saveBuff()"><input type="text" id="buff-c3" placeholder="3줄" onchange="saveBuff()">
-            </div>
-        </div>
-    </div>
-
-    <div class="section-title">🔮 스페셜 이벤트 (+100 EXP)</div>
-    <div class="special-box"><input type="text" id="special-input" placeholder="특별한 성취 기록"><button class="special-btn" onclick="addSpecialEvent()">기록</button></div>
-
-    <div class="section-title">📜 히스토리</div>
-    <div class="log-area" id="log-list"></div>
-    <div class="user-log-box"><input type="text" id="user-event-input" placeholder="직접 기록 (파란색)"><button class="user-log-btn" onclick="addUserEvent()">기록</button></div>
-
-    <div class="footer-btns">
-        <button class="reset-btn" onclick="resetLevel()">LV 초기화</button>
-        <button class="reset-btn" onclick="resetSoft()">스탯 초기화</button>
-        <button class="reset-btn" onclick="resetHistoryOnly()">로그 삭제</button>
-    </div>
+<div class="bar">
+  <input id="mt" placeholder="책 제목" style="flex:2;min-width:150px">
+  <input id="ma" placeholder="저자" style="flex:1;min-width:100px">
+  <input id="mp" type="number" placeholder="쪽수" style="width:90px">
+  <input id="mc" type="color" title="책등 색">
+  <button id="madd">+ 책 꽂기</button>
+</div>
+<div class="bar">
+  <button class="ghost" id="png">🖼 PNG 저장</button>
+  <button class="ghost" id="share">📤 공유</button>
 </div>
 
+<div class="tabs" id="years"></div>
+<div id="shelf"></div>
+</div>
+
+<div id="tip"></div>
+
+<div class="modal" id="modal"><div class="card">
+  <h2 id="mTitle"></h2><div class="au" id="mAuthor"></div>
+  <label>읽은 날짜 <input type="date" id="mDate"></label>
+  <div class="stars" id="stars"></div>
+  <div class="up"><span>책등 이미지</span><input type="file" id="mImg" accept="image/*" style="max-width:210px"><img id="mPrev" alt=""><button class="ghost" id="rmImg" type="button">제거</button></div>
+  <textarea id="mMemo" placeholder="독서 노트를 남겨보세요"></textarea>
+  <div class="btns"><button class="del" id="del">삭제</button><button class="ghost" id="close">닫기</button><button id="save">저장</button></div>
+</div></div>
+
 <script>
-    const QUESTS = ['🌅 6시 로그인', '🏃 수련 완료', '📖 독서 30분', '💰 골드 사수', '🗣️ 외국어 습득'];
-    const STORAGE_KEY = 'rpgDiaryLeonV10_Final_Fixed';
-    
-    let charData = { 
-        lv: 1, hp: 70, mp: 70, exp: 0, gold: 0, 
-        stats: { str: 10, int: 10, dex: 10, sense: 10, will: 10, luk: 10 }, 
-        logs: [], lastQuestDate: "", completedQuests: [],
-        dailyBuff: { lv: '', item: '', c1: '', c2: '', c3: '' },
-        isBuffActive: false, isDebuffActive: false, wasAlertActive: false
-    };
-    
-    let myChart;
+const $=s=>document.querySelector(s);
+const LS={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const thisYear=new Date().getFullYear();
+let books=LS.get('books',null),cur=null,rating=0,pendingImg,curYear=thisYear,extra=[];
+const today=()=>new Date().toISOString().slice(0,10);
+const yr=b=>+(b.date||today()).slice(0,4);
+if(!books)books=[
+ ['사피엔스','유발 하라리',700,'#2f6f5e','2025-03-12'],['햄릿','셰익스피어',260,'#f3d338','2025-05-02'],
+ ['트렌드 코리아','김난도',440,'#e11d48','2025-09-20'],['코스모스','칼 세이건',560,'#1a1a1a','2026-01-15'],
+ ['팩트풀니스','한스 로슬링',400,'#f08a00','2026-02-03'],['노 피플 존','김영하',300,'#3b82d9','2026-03-18'],
+ ['살인의 이유','저자',380,'#e0501e','2026-05-09'],['불편한 편의점','김호연',270,'#d7a82f','2026-07-01'],['로스트 라이프','저자',420,'#eeeeee','2026-08-22']
+].map((b,i)=>({id:'s'+i,title:b[0],author:b[1],pages:b[2],color:b[3],date:b[4],rating:3+(i%3),memo:''}));
+const save=()=>LS.set('books',books);
 
-    window.onload = () => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) charData = JSON.parse(saved);
-        checkDailyReset(); initChart(); render();
-    };
+/* ---------- 치수/색 ---------- */
+const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
+const thick=b=>Math.max(22,Math.min(84,Math.round(b.pages*0.11)));
+const height=b=>220+hash(b.title)%70;
+const lc=document.createElement('canvas').getContext('2d',{willReadFrequently:true});lc.canvas.width=lc.canvas.height=1;
+function lum(c){lc.fillStyle=c;lc.fillRect(0,0,1,1);const p=lc.getImageData(0,0,1,1).data;return .299*p[0]+.587*p[1]+.114*p[2]}
+const randColor=()=>'#'+[0,0,0].map(()=>(60+Math.random()*160|0).toString(16).padStart(2,'0')).join('');
+$('#mc').value=randColor();
 
-    function checkDailyReset() {
-        const today = new Date().toLocaleDateString();
-        if (charData.lastQuestDate !== today) {
-            charData.lastQuestDate = today; charData.completedQuests = [];
-            // 날짜가 바뀔 때만 초기화
-            charData.dailyBuff = { lv: '', item: '', c1: '', c2: '', c3: '' };
-            charData.isBuffActive = false; charData.isDebuffActive = false;
-            addLog("새로운 날의 시작!", "log-pos");
-        }
-        drawQuests();
-    }
+/* ---------- 책 추가 ---------- */
+$('#madd').onclick=()=>{
+  const t=$('#mt').value.trim();if(!t)return;
+  const b={id:'b'+Date.now(),title:t,author:$('#ma').value.trim(),pages:+$('#mp').value||300,color:$('#mc').value,
+    date:curYear===thisYear?today():`${curYear}-01-01`,rating:0,memo:''};
+  books.push(b);save();render();
+  $('#mt').value=$('#ma').value=$('#mp').value='';$('#mc').value=randColor();
+  openModal(b.id);
+};
 
-    function toggleStatus(type) {
-        if(type === 'buff') { charData.isBuffActive = !charData.isBuffActive; addLog(`버프 ${charData.isBuffActive ? '활성' : '해제'}`, 'log-pos'); } 
-        else { charData.isDebuffActive = !charData.isDebuffActive; addLog(`디버프 ${charData.isDebuffActive ? '활성' : '해제'}`, 'log-neg'); }
-        render();
-    }
+/* ---------- 책등 ---------- */
+const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+function spine(b){
+  const el=document.createElement('div'),w=thick(b),fg=lum(b.color)>150?'#222':'#fff';
+  el.className='book v'+hash(b.title)%3+(b.img?' img':'');
+  el.style.cssText=`width:${w}px;height:${height(b)}px;--c:${b.color};color:${fg}`;
+  const f=document.createElement('div');f.className='face';f.style.backgroundColor=b.color;
+  if(b.img){f.style.backgroundImage=`url(${b.img})`;f.style.backgroundSize='cover';f.style.backgroundPosition='center'}
+  else{
+    f.innerHTML=`<span class="t" style="font-size:${Math.max(11,Math.min(20,w*.42))}px"></span><span class="a"></span>`;
+    f.querySelector('.t').textContent=b.title;f.querySelector('.a').textContent=b.author;
+  }
+  const top=document.createElement('i');top.className='top';
+  el.append(top,f);
+  const tip=$('#tip');
+  el.onmouseenter=()=>{tip.innerHTML=`<b></b><br>📅 ${b.date||'-'}<br><span class="s">${stars(b.rating)}</span>`;tip.querySelector('b').textContent=b.title;tip.style.display='block'};
+  el.onmousemove=e=>{tip.style.left=Math.min(e.clientX+14,innerWidth-230)+'px';tip.style.top=e.clientY+14+'px'};
+  el.onmouseleave=()=>tip.style.display='none';
+  el.onclick=()=>{tip.style.display='none';openModal(b.id)};
+  return el;
+}
 
-    function saveBuff() {
-        charData.dailyBuff = {
-            lv: document.getElementById('buff-lv').value,
-            item: document.getElementById('buff-item').value,
-            c1: document.getElementById('buff-c1').value,
-            c2: document.getElementById('buff-c2').value,
-            c3: document.getElementById('buff-c3').value
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(charData));
-    }
+/* ---------- 연도 탭 + 책장 렌더링 ---------- */
+function yearList(){const s=new Set(books.map(yr));s.add(thisYear);s.add(curYear);extra.forEach(y=>s.add(y));return[...s].sort()}
+function render(){
+  $('#years').innerHTML=yearList().map(y=>`<button class="tab ${y===curYear?'on':''}" data-y="${y}">${y}<small>${books.filter(b=>yr(b)===y).length}</small></button>`).join('')
+    +'<button class="tab" id="addYear" title="연도 추가">＋</button>';
+  const list=books.filter(b=>yr(b)===curYear).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const sh=$('#shelf');
+  sh.innerHTML=`<div class="sh-head"><b>${curYear}</b><span>${list.length}권 · ${list.reduce((s,b)=>s+b.pages,0).toLocaleString()}쪽</span></div>`;
+  const cs=document.createElement('div');cs.className='case';sh.append(cs);
+  const W=cs.clientWidth-28-44;let rows=[[]],w=0;
+  list.forEach(b=>{const bw=thick(b)+2;if(w+bw>W&&rows.at(-1).length){rows.push([]);w=0}rows.at(-1).push(b);w+=bw});
+  while(rows.length<3)rows.push([]);          // 최소 3칸, 넘치면 아래 칸이 계속 늘어남
+  rows.forEach(r=>{const row=document.createElement('div');row.className='row';r.forEach(b=>row.append(spine(b)));cs.append(row)});
+}
+$('#years').onclick=e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.id==='addYear'){const y=+prompt('추가할 연도를 입력하세요 (예: 2024)');if(y>1900&&y<2200){extra.push(y);curYear=y;render()}return}
+  curYear=+t.dataset.y;render();
+};
+addEventListener('resize',render);
 
-    function drawQuests() {
-        const container = document.getElementById('quest-container');
-        container.innerHTML = QUESTS.map(q => `<label class="quest-item"><input type="checkbox" ${charData.completedQuests.includes(q) ? 'checked' : ''} onchange="toggleQuest('${q}', this)"> ${q}</label>`).join('');
-    }
+/* ---------- 독서 노트 모달 ---------- */
+function drawStars(){$('#stars').innerHTML=[1,2,3,4,5].map(i=>`<span data-i="${i}" class="${i<=rating?'on':''}">★</span>`).join('')}
+$('#stars').onclick=e=>{const i=+e.target.dataset.i;if(i){rating=rating===i?0:i;drawStars()}};
+function showPrev(src){const p=$('#mPrev');p.style.display=src?'block':'none';p.src=src||''}
+function readImg(f){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{
+  const k=Math.min(1,500/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.85))};im.src=r.result};r.readAsDataURL(f)})}
+$('#mImg').onchange=async e=>{const f=e.target.files[0];if(!f)return;pendingImg=await readImg(f);showPrev(pendingImg)};
+$('#rmImg').onclick=()=>{pendingImg=null;$('#mImg').value='';showPrev('')};
+function openModal(id){
+  cur=books.find(b=>b.id===id);if(!cur)return;
+  $('#mTitle').textContent=cur.title;$('#mAuthor').textContent=`${cur.author} · ${cur.pages}쪽`;
+  $('#mDate').value=cur.date||today();$('#mMemo').value=cur.memo||'';rating=cur.rating||0;drawStars();
+  pendingImg=undefined;$('#mImg').value='';showPrev(cur.img);
+  $('#modal').classList.add('on');
+}
+const closeM=()=>$('#modal').classList.remove('on');
+$('#close').onclick=closeM;$('#modal').onclick=e=>e.target.id==='modal'&&closeM();
+$('#save').onclick=()=>{
+  Object.assign(cur,{date:$('#mDate').value||today(),rating,memo:$('#mMemo').value});
+  if(pendingImg!==undefined)cur.img=pendingImg||'';
+  curYear=yr(cur);save();render();closeM();
+};
+$('#del').onclick=()=>{if(confirm('이 책을 책장에서 뺄까요?')){books=books.filter(b=>b!==cur);save();render();closeM()}};
 
-    function render() {
-        // HP/MP 상태 텍스트
-        const hpSt = document.getElementById('hp-status');
-        if(charData.hp >= 80) hpSt.innerText = "[활력 넘침]";
-        else if(charData.hp >= 40) hpSt.innerText = "[보통]";
-        else if(charData.hp >= 20) hpSt.innerText = "[피곤함]";
-        else hpSt.innerText = "[탈진]";
+/* ---------- 이미지 저장/공유 (현재 선택한 연도의 책장) ---------- */
+async function snap(){$('#tip').style.display='none';return html2canvas($('#shelf'),{backgroundColor:'#ecebe6',scale:2})}
+function download(c){const a=document.createElement('a');a.download=`my-bookshelf-${curYear}.png`;a.href=c.toDataURL('image/png');a.click()}
+$('#png').onclick=async()=>download(await snap());
+$('#share').onclick=async()=>{
+  const c=await snap();
+  c.toBlob(async blob=>{
+    const f=new File([blob],`my-bookshelf-${curYear}.png`,{type:'image/png'});
+    if(navigator.canShare?.({files:[f]})){try{await navigator.share({files:[f],title:`${curYear} 서재`});return}catch(e){if(e.name==='AbortError')return}}
+    download(c);alert('이 브라우저는 바로 공유를 지원하지 않아 PNG로 저장했어요. 카카오톡에서 이미지를 첨부해 공유하세요.');
+  });
+};
 
-        const mpSt = document.getElementById('mp-status');
-        if(charData.mp >= 80) mpSt.innerText = "[정신 맑음]";
-        else if(charData.mp >= 40) mpSt.innerText = "[안정]";
-        else if(charData.mp >= 20) mpSt.innerText = "[주의 산만]";
-        else mpSt.innerText = "[혼란스러움]";
-
-        // 위험 알림 로직
-        const isCurrentlyDangerous = charData.hp <= 30 || charData.mp <= 30;
-        if (isCurrentlyDangerous && !charData.wasAlertActive) {
-            addLog("⚠️ 시스템 경보: 수치 위험! 회복이 필요합니다.", "log-neg");
-            charData.wasAlertActive = true;
-        } else if (!isCurrentlyDangerous && charData.wasAlertActive) {
-            addLog("✅ 수치가 정상 범위로 회복되었습니다.", "log-pos");
-            charData.wasAlertActive = false;
-        }
-
-        // 버프 입력창 값 유지 (이 부분이 추가되었습니다)
-        document.getElementById('buff-lv').value = charData.dailyBuff.lv || '';
-        document.getElementById('buff-item').value = charData.dailyBuff.item || '';
-        document.getElementById('buff-c1').value = charData.dailyBuff.c1 || '';
-        document.getElementById('buff-c2').value = charData.dailyBuff.c2 || '';
-        document.getElementById('buff-c3').value = charData.dailyBuff.c3 || '';
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(charData));
-        document.getElementById('lv-val').innerText = charData.lv;
-        document.getElementById('job-title').innerText = getJobTitle(charData.lv);
-        document.getElementById('gold-val').innerText = charData.gold.toLocaleString() + " G";
-        
-        document.getElementById('name-buff').style.display = charData.isBuffActive ? 'inline' : 'none';
-        document.getElementById('name-debuff').style.display = charData.isDebuffActive ? 'inline' : 'none';
-        document.getElementById('name-alert').style.display = isCurrentlyDangerous ? 'inline' : 'none';
-
-        document.getElementById('hp-bar').style.width = charData.hp + "%";
-        document.getElementById('mp-bar').style.width = charData.mp + "%";
-        document.getElementById('exp-bar').style.width = (charData.exp % 100) + "%";
-        document.getElementById('hp-num').innerText = `${charData.hp}/100`;
-        document.getElementById('mp-num').innerText = `${charData.mp}/100`;
-
-        document.getElementById('btn-buff').className = charData.isBuffActive ? 't-btn active-b' : 't-btn';
-        document.getElementById('btn-debuff').className = charData.isDebuffActive ? 't-btn active-d' : 't-btn';
-
-        const body = document.body;
-        body.className = charData.lv >= 35 ? 'theme-legend' : (charData.lv >= 20 ? 'theme-veteran' : (charData.lv >= 10 ? 'theme-apprentice' : 'theme-rookie'));
-
-        for (let s in charData.stats) document.getElementById(`in-${s}`).value = charData.stats[s];
-        document.getElementById('log-list').innerHTML = charData.logs.map(l => `<div class="${l.colorClass}">> ${l.time} | ${l.msg}</div>`).reverse().join('');
-        myChart.data.datasets[0].data = Object.values(charData.stats);
-        myChart.update();
-    }
-
-    function initChart() {
-        const ctx = document.getElementById('statChart').getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: ['STR', 'INT', 'DEX', 'SENSE', 'WILL', 'LUK'],
-                datasets: [{ data: Object.values(charData.stats), backgroundColor: 'rgba(62, 39, 35, 0.4)', borderColor: 'rgba(62, 39, 35, 1)', borderWidth: 2, pointRadius: 3 }]
-            },
-            options: { scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
-        });
-    }
-
-    function getJobTitle(lv) {
-        if (lv >= 50) return "👑 전설의 수호자";
-        if (lv >= 35) return "🛡️ 성기사";
-        if (lv >= 20) return "🏹 베테랑 용사";
-        if (lv >= 10) return "✨ 숙련된 훈련생";
-        return "🌱 초보 모험가";
-    }
-
-    function addLog(msg, colorClass = 'log-pos') {
-        const time = new Date().toLocaleTimeString('ko-KR', { hour12: false, hour: '2-digit', minute: '2-digit' });
-        charData.logs.push({ time, msg, colorClass });
-        if (charData.logs.length > 50) charData.logs.shift();
-    }
-
-    function toggleQuest(name, cb) {
-        if (cb.checked) { charData.completedQuests.push(name); updateExp(30, `퀘스트: ${name}`); } 
-        else { charData.completedQuests = charData.completedQuests.filter(q => q !== name); addLog(`취소: ${name}`, 'log-neg'); }
-        render();
-    }
-
-    function updateStatus(type, amt, reasonParam) {
-        const reason = reasonParam || document.getElementById('status-reason').value || "일반 활동";
-        if (type === 'hp') charData.hp = Math.max(0, Math.min(100, charData.hp + amt));
-        else charData.mp = Math.max(0, Math.min(100, charData.mp + amt));
-        addLog(`${type.toUpperCase()} ${amt>0?'+':''}${amt} (${reason})`, amt < 0 ? 'log-neg' : 'log-pos');
-        document.getElementById('status-reason').value = "";
-        render();
-    }
-
-    function promptStatus(type) {
-        const val = parseInt(prompt(`${type.toUpperCase()} 변화량을 입력하세요:`));
-        if(!isNaN(val)) {
-            const reason = prompt("변화 사유를 입력하세요:", "커스텀 조절") || "커스텀 조절";
-            updateStatus(type, val, reason);
-        }
-    }
-
-    function updateExp(amt, reasonParam) {
-        const reason = reasonParam || document.getElementById('exp-reason').value || "성장";
-        const oldLv = Math.floor(charData.exp / 100) + 1;
-        charData.exp += amt;
-        const newLv = Math.floor(charData.exp / 100) + 1;
-        addLog(`✨ EXP +${amt} (${reason})`, 'log-pos');
-        if (newLv > oldLv) { 
-            charData.lv = newLv; 
-            addLog(`🎊 LEVEL UP! Lv.${newLv}`, 'log-pos');
-            showLevelUpEffect(newLv);
-        }
-        document.getElementById('exp-reason').value = "";
-        render();
-    }
-
-    function showLevelUpEffect(lv) {
-        const overlay = document.createElement('div');
-        overlay.className = 'levelup-overlay';
-        overlay.innerHTML = `
-            <div class="levelup-card">
-                <div style="font-size: 3rem;">🎊</div>
-                <div style="color: #3e2723; margin: 10px 0; font-size: 1.5rem;">LEVEL UP!</div>
-                <div style="font-size: 2.5rem; color: #ff8f00;">Lv.${lv}</div>
-                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 20px; padding: 10px 20px; background: var(--exp-color); border: 2px solid #3e2723; cursor: pointer; font-family: 'DungGeunMo';">확인</button>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-        setTimeout(() => { if(overlay.parentNode) overlay.remove(); }, 4000);
-    }
-
-    function promptExp() {
-        const val = parseInt(prompt(`EXP 증가량을 입력하세요:`));
-        if(!isNaN(val)) {
-            const reason = prompt("성장 사유를 입력하세요:", "커스텀 성장") || "커스텀 성장";
-            updateExp(val, reason);
-        }
-    }
-
-    function changeStat(statName, newValue) {
-        const oldVal = charData.stats[statName];
-        const newVal = parseInt(newValue) || 0;
-        const diff = newVal - oldVal;
-        if (diff === 0) return;
-        const reason = prompt(`${statName.toUpperCase()} 변경 사유:`, "수련");
-        if (reason) { charData.stats[statName] = newVal; addLog(`${statName.toUpperCase()} ${diff>0?'+':''}${diff} (${reason})`, diff < 0 ? 'log-neg' : 'log-pos'); } 
-        else document.getElementById(`in-${statName}`).value = oldVal;
-        render();
-    }
-
-    function updateGold() {
-        const reason = document.getElementById('exp-reason').value || "보상";
-        const amt = parseInt(prompt("골드 변화량:"));
-        if (!isNaN(amt)) { charData.gold += amt; addLog(`💰 GOLD ${amt>0?'+':''}${amt} (${reason})`, amt < 0 ? 'log-neg' : 'log-pos'); render(); }
-    }
-
-    function addSpecialEvent() {
-        const input = document.getElementById('special-input');
-        if (!input.value) return;
-        addLog(`★ SPECIAL: ${input.value} (+100 EXP)`, 'log-special');
-        updateExp(100, "스페셜 성취");
-        input.value = ""; render();
-    }
-
-    function addUserEvent() {
-        const input = document.getElementById('user-event-input');
-        if (!input.value) return;
-        addLog(`[기록] ${input.value}`, 'log-user');
-        input.value = ""; render();
-    }
-
-    function resetLevel() { if(confirm("LV 초기화?")) { charData.lv = 1; charData.exp = 0; render(); } }
-    function resetSoft() { if(confirm("데이터 초기화?")) { charData.hp = 70; charData.mp = 70; charData.gold = 0; charData.stats = { str: 10, int: 10, dex: 10, sense: 10, will: 10, luk: 10 }; render(); } }
-    function resetHistoryOnly() { if(confirm("로그 삭제?")) { charData.logs = []; render(); } }
+render();
 </script>
-
-</body>
-</html>
-
-
+</body></html>
