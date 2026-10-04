@@ -69,7 +69,8 @@ button.ghost:hover{background:#151515;color:#fff;border-color:#151515}
 .modal.on{display:flex}
 .card{background:#f8f7f3;border-radius:22px;padding:24px;width:min(460px,100%);display:grid;gap:12px;box-shadow:0 30px 60px rgba(0,0,0,.35)}
 .card h2{margin:0;font-size:22px;letter-spacing:-.03em}.card .au{color:#8d8a82;font-size:13px;margin-top:-8px}
-.stars span{font-size:30px;cursor:pointer;color:#d5d2c9}.stars span.on{color:#ff4d2e}
+.stars span{display:inline-block;font-size:32px;cursor:pointer;color:transparent;background:linear-gradient(90deg,#ff4d2e var(--f),#d5d2c9 var(--f));-webkit-background-clip:text;background-clip:text}
+.stars small{margin-left:10px;font-size:13px;color:#8d8a82;vertical-align:middle}
 textarea{min-height:140px;resize:vertical;border:1.5px solid #d5d2c9;border-radius:12px;padding:12px}
 textarea:focus{border-color:#151515}
 .btns{display:flex;gap:8px;justify-content:flex-end}
@@ -168,7 +169,7 @@ $('#madd').onclick=()=>{
 };
 
 /* ---------- 책등 ---------- */
-const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+const stars=n=>'★'.repeat(Math.floor(n))+(n%1?'½':'')+'☆'.repeat(5-Math.ceil(n))+(n?` ${n}`:'');
 function spine(b){
   const el=document.createElement('div'),w=thick(b),fg=lum(b.color)>150?'#222':'#fff';
   el.className='book v'+hash(b.title)%3+(b.img?' img':'');
@@ -213,8 +214,8 @@ $('#years').onclick=e=>{
 let lw=innerWidth;addEventListener('resize',()=>{if(innerWidth!==lw){lw=innerWidth;render()}}); // 주소창 변화로 인한 불필요한 재렌더 방지
 
 /* ---------- 독서 노트 모달 ---------- */
-function drawStars(){$('#stars').innerHTML=[1,2,3,4,5].map(i=>`<span data-i="${i}" class="${i<=rating?'on':''}">★</span>`).join('')}
-$('#stars').onclick=e=>{const i=+e.target.dataset.i;if(i){rating=rating===i?0:i;drawStars()}};
+function drawStars(){$('#stars').innerHTML=[1,2,3,4,5].map(i=>`<span data-i="${i}" style="--f:${rating>=i?100:rating>=i-.5?50:0}%">★</span>`).join('')+`<small>${rating?rating.toFixed(1)+'점':'별의 왼쪽 반을 누르면 0.5점'}</small>`}
+$('#stars').onclick=e=>{const t=e.target.closest('span');if(!t)return;const i=+t.dataset.i,r=t.getBoundingClientRect(),v=e.clientX-r.left<r.width/2?i-.5:i;rating=rating===v?0:v;drawStars()};
 function showPrev(src){const p=$('#mPrev');p.style.display=src?'block':'none';p.src=src||''}
 function readImg(f){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{
   const k=Math.min(1,500/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;
