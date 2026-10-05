@@ -243,7 +243,7 @@ function openModal(id){
   $('#modal').classList.add('on');
 }
 const closeM=()=>$('#modal').classList.remove('on');
-$('#close').onclick=closeM;$('#modal').onclick=e=>e.target.id==='modal'&&closeM();
+$('#close').onclick=closeM;$('#modal').onclick=e=>{if(e.target.id==='modal')closeM()}; // false를 반환하면 파일 선택창이 취소되므로 중괄호 사용
 $('#save').onclick=()=>{
   Object.assign(cur,{date:$('#mDate').value||today(),rating,memo:$('#mMemo').value});
   curYear=yr(cur);save();render();closeM();
