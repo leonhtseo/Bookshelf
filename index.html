@@ -135,9 +135,9 @@ textarea:focus{border-color:#151515}
 
 <script>
 const $=s=>document.querySelector(s);
-const LS={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const LS={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
 const thisYear=new Date().getFullYear();
-let books=LS.get('books',null),cur=null,rating=0,pendingImg,curYear=thisYear,extra=[];
+let books=LS.get('books',null),cur=null,rating=0,curYear=thisYear,extra=[];
 const today=()=>new Date().toISOString().slice(0,10);
 const yr=b=>+(b.date||today()).slice(0,4);
 if(!books)books=[
@@ -146,7 +146,7 @@ if(!books)books=[
  ['팩트풀니스','한스 로슬링',400,'#f08a00','2026-02-03'],['노 피플 존','김영하',300,'#3b82d9','2026-03-18'],
  ['살인의 이유','저자',380,'#e0501e','2026-05-09'],['불편한 편의점','김호연',270,'#d7a82f','2026-07-01'],['로스트 라이프','저자',420,'#eeeeee','2026-08-22']
 ].map((b,i)=>({id:'s'+i,title:b[0],author:b[1],pages:b[2],color:b[3],date:b[4],rating:3+(i%3),memo:''}));
-const save=()=>LS.set('books',books);
+const save=()=>{if(!LS.set('books',books))alert('저장 공간이 부족해서 저장하지 못했어요. 책등 이미지를 몇 장 지워 주세요.')};
 
 /* ---------- 치수/색 ---------- */
 const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
@@ -217,23 +217,35 @@ let lw=innerWidth;addEventListener('resize',()=>{if(innerWidth!==lw){lw=innerWid
 function drawStars(){$('#stars').innerHTML=[1,2,3,4,5].map(i=>`<span data-i="${i}" style="--f:${rating>=i?100:rating>=i-.5?50:0}%">★</span>`).join('')+`<small>${rating?rating.toFixed(1)+'점':'별의 왼쪽 반을 누르면 0.5점'}</small>`}
 $('#stars').onclick=e=>{const t=e.target.closest('span');if(!t)return;const i=+t.dataset.i,r=t.getBoundingClientRect(),v=e.clientX-r.left<r.width/2?i-.5:i;rating=rating===v?0:v;drawStars()};
 function showPrev(src){const p=$('#mPrev');p.style.display=src?'block':'none';p.src=src||''}
-function readImg(f){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{
-  const k=Math.min(1,500/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;
-  c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.85))};im.src=r.result};r.readAsDataURL(f)})}
-$('#mImg').onchange=async e=>{const f=e.target.files[0];if(!f)return;pendingImg=await readImg(f);showPrev(pendingImg)};
-$('#rmImg').onclick=()=>{pendingImg=null;$('#mImg').value='';showPrev('')};
+async function readImg(f){
+  const url=URL.createObjectURL(f);
+  try{
+    const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
+    const k=Math.min(1,500/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+    return c.toDataURL('image/jpeg',.85);
+  }finally{URL.revokeObjectURL(url)}
+}
+// 이미지를 고르면 바로 책등에 적용 (저장 버튼을 누르지 않아도 됨)
+$('#mImg').onchange=async e=>{
+  const f=e.target.files[0];if(!f||!cur)return;
+  try{cur.img=await readImg(f);save();showPrev(cur.img);render()}
+  catch(err){alert('이 이미지는 불러올 수 없어요. JPG나 PNG 파일로 다시 시도해 주세요. (HEIC 형식은 지원되지 않아요)')}
+  e.target.value='';
+};
+$('#rmImg').onclick=()=>{if(!cur)return;cur.img='';save();showPrev('');render()};
 function openModal(id){
   cur=books.find(b=>b.id===id);if(!cur)return;
   $('#mTitle').textContent=cur.title;$('#mAuthor').textContent=`${cur.author} · ${cur.pages}쪽`;
   $('#mDate').value=cur.date||today();$('#mMemo').value=cur.memo||'';rating=cur.rating||0;drawStars();
-  pendingImg=undefined;$('#mImg').value='';showPrev(cur.img);
+  $('#mImg').value='';showPrev(cur.img);
   $('#modal').classList.add('on');
 }
 const closeM=()=>$('#modal').classList.remove('on');
 $('#close').onclick=closeM;$('#modal').onclick=e=>e.target.id==='modal'&&closeM();
 $('#save').onclick=()=>{
   Object.assign(cur,{date:$('#mDate').value||today(),rating,memo:$('#mMemo').value});
-  if(pendingImg!==undefined)cur.img=pendingImg||'';
   curYear=yr(cur);save();render();closeM();
 };
 $('#del').onclick=()=>{if(confirm('이 책을 책장에서 뺄까요?')){books=books.filter(b=>b!==cur);save();render();closeM()}};
